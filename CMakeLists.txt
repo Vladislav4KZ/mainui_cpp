@@ -64,16 +64,19 @@ endif()
 list(APPEND MAINUI_SOURCES ${MAINUI_CONTROLS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_MENUS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_FONT_RENDER_SOURCES})
-
 if(EMSCRIPTEN)
     add_executable(${MAINUI_LIBRARY} ${MAINUI_SOURCES})
-    set_target_properties(${MAINUI_LIBRARY} PROPERTIES SUFFIX ".wasm")
-    target_compile_options(${MAINUI_LIBRARY} PRIVATE -fPIC)
-    target_link_options(${MAINUI_LIBRARY} PRIVATE
-        -sSIDE_MODULE=1
-    )
 else()
     add_library(${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
+endif()
+if(EMSCRIPTEN)
+    set_target_properties(${MAINUI_LIBRARY} PROPERTIES SUFFIX ".wasm")
+
+    target_compile_options(${MAINUI_LIBRARY} PRIVATE -fPIC -fvisibility=hidden)
+
+    target_link_options(${MAINUI_LIBRARY} PRIVATE
+        "-sSIDE_MODULE=1"
+    )
 endif()
 
 set_target_postfix(${MAINUI_LIBRARY})
