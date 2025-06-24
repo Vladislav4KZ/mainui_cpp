@@ -23,12 +23,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(MAINUI)
 
-if("${CMAKE_CXX_COMPILER}" MATCHES "em\\+\\+")
-    set(EMSCRIPTEN TRUE)
-else()
-    set(EMSCRIPTEN FALSE)
-endif()
-
 # By default we require C++11 support.
 # But it can be overriden with -DMY_COMPILER_SUCKS compiler option
 # It's not recommended and may not work(as it's done only for MSVC6 support)
@@ -65,18 +59,17 @@ list(APPEND MAINUI_SOURCES ${MAINUI_CONTROLS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_MENUS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_FONT_RENDER_SOURCES})
 if(EMSCRIPTEN)
-    add_executable(${MAINUI_LIBRARY} ${MAINUI_SOURCES})
+	add_executable(${MAINUI_LIBRARY} ${MAINUI_SOURCES})
+
+	set_target_properties(${MAINUI_LIBRARY} PROPERTIES SUFFIX ".wasm")
+
+	target_compile_options(${MAINUI_LIBRARY} PRIVATE -fPIC -fvisibility=hidden)
+
+	target_link_options(${MAINUI_LIBRARY} PRIVATE
+			"-sSIDE_MODULE=1"
+	)
 else()
-    add_library(${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
-endif()
-if(EMSCRIPTEN)
-    set_target_properties(${MAINUI_LIBRARY} PROPERTIES SUFFIX ".wasm")
-
-    target_compile_options(${MAINUI_LIBRARY} PRIVATE -fPIC -fvisibility=hidden)
-
-    target_link_options(${MAINUI_LIBRARY} PRIVATE
-        "-sSIDE_MODULE=1"
-    )
+	add_library(${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
 endif()
 
 set_target_postfix(${MAINUI_LIBRARY})
@@ -130,10 +123,8 @@ if(MAINUI_USE_CUSTOM_FONT_RENDER)
 	add_definitions(-DMAINUI_USE_CUSTOM_FONT_RENDER)
 endif()
 
-if(NOT EMSCRIPTEN)
-    install(TARGETS ${MAINUI_LIBRARY} DESTINATION "${GAME_DIR}/${CLIENT_INSTALL_DIR}/")
+install(TARGETS ${MAINUI_LIBRARY} DESTINATION "${GAME_DIR}/${CLIENT_INSTALL_DIR}/")
 
-    if(MSVC)
-        install(FILES $<TARGET_PDB_FILE:${MAINUI_LIBRARY}> DESTINATION "${GAME_DIR}/${CLIENT_INSTALL_DIR}/" OPTIONAL)
-    endif()
+if(MSVC)
+    install(FILES $<TARGET_PDB_FILE:${MAINUI_LIBRARY}> DESTINATION "${GAME_DIR}/${CLIENT_INSTALL_DIR}/" OPTIONAL)
 endif()
