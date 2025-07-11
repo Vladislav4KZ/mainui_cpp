@@ -690,12 +690,14 @@ void CMenuPlayerSetup::_Init( void )
 
 	AddButton( L( "Adv. Options" ), nullptr, PC_ADV_OPT, UI_GameOptions_Menu );
 	gameOpt->SetGrayed( !UI_AdvUserOptions_IsAvailable() );
+	
+	AddButton( L( "Crosshair" ), nullptr, PC_CROSSHAIR, UI_Crosshair_Menu );
 
 	showModels.iFlags |= addFlags;
 	showModels.szName = L( "Show 3D preview" );
 	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
 	showModels.LinkCvar( "ui_showmodels" );
-	showModels.SetCoord( 77, 230 + m_iBtnsNum * 50 + 10 );
+	showModels.SetCoord( 77, 180 + m_iBtnsNum * 50 + 10 );
 
 	hiModels.iFlags |= addFlags;
 	hiModels.szName = L( "GameUI_HighModels" );
