@@ -697,7 +697,7 @@ void CMenuPlayerSetup::_Init( void )
 	showModels.szName = L( "Show 3D preview" );
 	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
 	showModels.LinkCvar( "ui_showmodels" );
-	showModels.SetCoord( 77, 180 + m_iBtnsNum * 50 + 10 );
+	showModels.SetCoord( 77, 230 + m_iBtnsNum * 50 + 10 );
 
 	hiModels.iFlags |= addFlags;
 	hiModels.szName = L( "GameUI_HighModels" );
