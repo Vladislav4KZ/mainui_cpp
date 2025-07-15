@@ -167,7 +167,7 @@ void CMenuCrosshair::_Init( void )
 	done.SetPicture( PC_CANCEL );
 	done.onReleased = VoidCb( &CMenuCrosshair::Hide );
 
-	crosshair.szName = L( "Crosshair appearance" );
+	crosshair.szName = L( "GameUI_CrosshairDescription" );
 	crosshair.SetRect( 700, 230, 200, 200 );
 	crosshair.hImage = EngFuncs::PIC_Load( "gfx/vgui/crosshair.tga", 0 );
 
