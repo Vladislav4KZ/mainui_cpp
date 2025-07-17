@@ -132,19 +132,19 @@ void CMenuCrosshair::_Init( void )
 
 	gap.eFocusAnimation = QM_PULSEIFFOCUS;
 	gap.SetNameAndStatus( L( "Gap:" ), L( "Space between crosshair's lines" ) );
-	gap.Setup( 0, 40, 1 );
+	gap.Setup( 0, 13, 1 );
 
 	pad.eFocusAnimation = QM_PULSEIFFOCUS;
 	pad.SetNameAndStatus( L( "Padding:" ), L( "Border around crosshair" ) );
-	pad.Setup( 0, 255, 1 );
+	pad.Setup( 0, 16, 1 );
 
 	size.eFocusAnimation = QM_PULSEIFFOCUS;
 	size.SetNameAndStatus( L( "Size:" ), L( "Crosshair size" ) );
-	size.Setup( 0, 60, 1 );
+	size.Setup( 0, 32, 1 );
 
 	thick.eFocusAnimation = QM_PULSEIFFOCUS;
 	thick.SetNameAndStatus( L( "Thickness:" ), L( "Crosshair thickness" ) );
-	thick.Setup( 0, 20, 1 );
+	thick.Setup( 0, 11, 1 );
 
 	dynScale.eFocusAnimation = QM_PULSEIFFOCUS;
 	dynScale.SetNameAndStatus( L( "Dynamic scale:" ), L( "Scale of the dynamic crosshair movement" ) );
@@ -274,8 +274,10 @@ void CMenuCrosshair::CMenuCrosshairPreview::DrawCrosshairPadding( int _pad, int 
 
 	uint color = PackRGBA( 0, 0, 0, (uint)parent->alpha.GetCurrentValue() );
 
-	UI_FillRect( x0, y0, x1, y1, color );
-	UI_FillRect( x0 + pad, y0 + pad, x1 + pad, y1 + pad, color );
+	UI_FillRect( x0 - pad, y0 - pad, x1 + 2 * pad, pad, color ); // top part
+	UI_FillRect( x0 - pad, y0 + y1, x1 + 2 * pad, pad, color ); // bottom part
+	UI_FillRect( x0 - pad, y0, pad, y1, color ); // left part
+	UI_FillRect( x0 + x1, y0, pad, y1, color ); // right part
 }
 
 void CMenuCrosshair::CMenuCrosshairPreview::Draw()
@@ -326,16 +328,6 @@ void CMenuCrosshair::CMenuCrosshairPreview::Draw()
 	uint textflags = ( iFlags & QMF_DROPSHADOW ) ? ETF_SHADOW : 0;
 	UI_DrawString( font, m_scPos.x, textHeight, m_scSize.w, m_scChSize, szName, uiColorHelp, m_scChSize, QM_LEFT, textflags | ETF_FORCECOL );
 
-	if ( parent->dot.bChecked )
-		DrawCrosshairSection( x0, y0, x1, y1, parent );
-
-	if ( !parent->tShape.bChecked )
-		DrawCrosshairSection( x0, outer.top, x1, inner.top, parent );
-
-	DrawCrosshairSection( x0, inner.bottom, x1, outer.bottom, parent );
-	DrawCrosshairSection( outer.left, y0, inner.left, y1, parent );
-	DrawCrosshairSection( inner.right, y0, outer.right, y1, parent );
-
 	/* draw padding if wanted */
 	if ( parent->pad.GetCurrentValue() )
 	{
@@ -352,4 +344,14 @@ void CMenuCrosshair::CMenuCrosshairPreview::Draw()
 		DrawCrosshairPadding( pad, outer.left, y0, inner.left, y1, parent );
 		DrawCrosshairPadding( pad, inner.right, y0, outer.right, y1, parent );
 	}
+
+	if ( parent->dot.bChecked )
+		DrawCrosshairSection( x0, y0, x1, y1, parent );
+
+	if ( !parent->tShape.bChecked )
+		DrawCrosshairSection( x0, outer.top, x1, inner.top, parent );
+
+	DrawCrosshairSection( x0, inner.bottom, x1, outer.bottom, parent );
+	DrawCrosshairSection( outer.left, y0, inner.left, y1, parent );
+	DrawCrosshairSection( inner.right, y0, outer.right, y1, parent );
 }
