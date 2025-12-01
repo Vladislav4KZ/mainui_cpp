@@ -295,6 +295,7 @@ void UI_TouchEdit_Menu( void );
 void UI_FileDialog_Menu( void );
 void UI_TouchButtons_GetButtonList();
 void UI_GamePad_Menu( void );
+void UI_Language_Menu( void );
 void UI_Zoo_Menu( void );
 void UI_ServerInfo_Menu( netadr_t adr, const char *hostname );
 

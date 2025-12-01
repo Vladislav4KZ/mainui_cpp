@@ -63,6 +63,8 @@ void CMenuOptions::_Init( void )
 		PC_VIDEO, UI_Video_Menu, QMF_NOTIFY );
 	AddButton( L( "Touch" ), L( "Change touch settings and buttons" ),
 		PC_TOUCH, UI_Touch_Menu, QMF_NOTIFY, 't' );
+	AddButton( L( "Language" ), L( "Change the game language" ),
+        PC_LANGUAGE, UI_Language_Menu, QMF_NOTIFY, 'l' );
 	AddButton( L( "GameUI_Joystick" ), L( "Change gamepad axis and button settings" ),
 		PC_GAMEPAD, UI_GamePad_Menu, QMF_NOTIFY, 'g' );
 	AddButton( L( "Update" ), L( "Check for updates" ),
