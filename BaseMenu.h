@@ -60,6 +60,7 @@ extern cvar_t	*ui_showmodels;
 extern cvar_t   *ui_show_window_stack;
 extern cvar_t	*ui_borderclip;
 extern cvar_t	*ui_prefer_won_background;
+extern cvar_t	*ui_background_stretch;
 
 enum EUISounds
 {
@@ -227,6 +228,8 @@ void UI_CloseMenu( void );
 
 // SCR support
 void UI_LoadScriptConfig( void );
+void UI_SaveScriptConfig( void );
+void UI_ApplyServerSettings( void );
 
 class CMenuEntry
 {

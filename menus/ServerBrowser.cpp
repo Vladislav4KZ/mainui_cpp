@@ -774,6 +774,10 @@ void CMenuServerBrowser::ParseServerListFromFile( const char *filename, CUtlVect
 		if( !afile )
 			break;
 
+		// ignore legacy protocol
+		if( !strcmp( entry.prot, "48" ))
+			continue;
+
 		list.AddToTail( entry );
 	}
 
@@ -962,22 +966,37 @@ void CMenuServerBrowser::AddServer( void )
 
 	// FIXME: for now we can only show custom servers at favorites tab
 
+	// Check for duplicates in favorites list
+	FOR_EACH_VEC( favoritesList, i )
+	{
+		if( !strcmp( favoritesList[i].sadr, addressField.GetBuffer() ) &&
+		    !strcmp( favoritesList[i].prot, proto ))
+		{
+			UI_ShowMessageBox( L( "Server already in favorites" ));
+			return;
+		}
+	}
+
 	favlist_entry_t entry( addressField.GetBuffer(), proto, false );
 	favoritesList.AddToTail( entry );
 
 	if( tabSwitch.GetState() != 2 )
+	{
 		tabSwitch.SetState( 2 );
+	}
+	else
+	{
+		CUtlString fakeInfoString;
+		entry.GenerateDummyInfoString( fakeInfoString );
 
-	CUtlString fakeInfoString;
-	entry.GenerateDummyInfoString( fakeInfoString );
+		server_t serv( adr, fakeInfoString, false, true );
+		serv.UpdateData();
+		serv.SetPing( MAX_PING );
+		gameListModel.servers.AddToTail( serv );
 
-	server_t serv( adr, fakeInfoString, false, true );
-	serv.UpdateData();
-	serv.SetPing( MAX_PING );
-	gameListModel.servers.AddToTail( serv );
-
-	entry.QueryServer();
-	UI_MenuResetPing_f();
+		entry.QueryServer();
+		UI_MenuResetPing_f();
+	}
 }
 
 /*
@@ -1272,8 +1291,10 @@ void CMenuServerBrowser::Show()
 
 		favoritesList.RemoveAll();
 		historyList.RemoveAll();
-		ParseServerListFromFile( "favorite_servers.lst", favoritesList );
-		ParseServerListFromFile( "history_servers.lst", historyList );
+		if( EngFuncs::FileExists( "favorite_servers.lst", true ) )
+			ParseServerListFromFile( "favorite_servers.lst", favoritesList );
+		if( EngFuncs::FileExists( "history_servers.lst", true ) )
+			ParseServerListFromFile( "history_servers.lst", historyList );
 	}
 
 	RealignButtons();
