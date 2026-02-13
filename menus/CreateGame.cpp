@@ -225,6 +225,11 @@ void CMenuCreateGame::_Init( void )
 
 	hostName.szName = L( "GameUI_ServerName" );
 	hostName.iMaxLength = 28;
+	SET_EVENT_MULTI( hostName.onCvarGet,
+	{
+		CMenuField *self = (CMenuField*)pSelf;
+		self->SetBuffer( UI_GetScriptCvar( self->CvarName() ) );
+	});
 	hostName.LinkCvar( "hostname" );
 
 	maxClients.iMaxLength = 3;
@@ -245,7 +250,7 @@ void CMenuCreateGame::_Init( void )
 	SET_EVENT_MULTI( maxClients.onCvarGet,
 	{
 		CMenuField *self = (CMenuField*)pSelf;
-		const char *val = EngFuncs::GetCvarString( self->CvarName() );
+		const char *val = UI_GetScriptCvar( self->CvarName() );
 		self->SetBuffer( val );
 
 		const char *buf = self->GetBuffer();
@@ -262,6 +267,11 @@ void CMenuCreateGame::_Init( void )
 	password.iMaxLength = 16;
 	password.eTextAlignment = QM_CENTER;
 	password.bHideInput = true;
+	SET_EVENT_MULTI( password.onCvarGet,
+	{
+		CMenuField *self = (CMenuField*)pSelf;
+		self->SetBuffer( UI_GetScriptCvar( self->CvarName() ) );
+	});
 	password.LinkCvar( "sv_password" );
 
 	msgBox.onPositive = Begin;
@@ -307,6 +317,12 @@ void CMenuCreateGame::SaveCvars()
 	hostName.WriteCvar();
 	maxClients.WriteCvar();
 	password.WriteCvar();
+
+	// update script variables so they are saved to settings.scr
+	UI_SetScriptCvar( "hostname", hostName.GetBuffer() );
+	UI_SetScriptCvar( "maxplayers", maxClients.GetBuffer() );
+	UI_SetScriptCvar( "sv_password", password.GetBuffer() );
+
 	EngFuncs::CvarSetValue( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? nat.bChecked : 0 );
 }
 
