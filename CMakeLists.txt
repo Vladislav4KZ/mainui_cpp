@@ -81,9 +81,21 @@ if(MAINUI_USE_CUSTOM_FONT_RENDER)
 	add_definitions(-DMAINUI_USE_CUSTOM_FONT_RENDER)
 endif()
 
-set_target_postfix(menu)
-install(TARGETS menu DESTINATION "${GAME_DIR}/${CLIENT_INSTALL_DIR}")
+if(NOT BUILD_AS_PART_OF_ENGINE)
+	# grab platform library suffix
+	set_target_postfix(menu)
+	if(NOT DEFINED GAMEDIR AND DEFINED GAME_DIR)
+		# parent project provides GAME_DIR, use it as GAMEDIR for compatibility
+		set(GAMEDIR "${GAME_DIR}")
+	endif()
+else()
+	# install to the same directory as engine
+        set(GAMEDIR ".")
+        set(CLIENT_INSTALL_DIR ".")
+endif()
+
+install(TARGETS menu DESTINATION "${GAMEDIR}/${CLIENT_INSTALL_DIR}")
 
 if(MSVC)
-	install(FILES $<TARGET_PDB_FILE:menu> DESTINATION "${GAME_DIR}/${CLIENT_INSTALL_DIR}" OPTIONAL)
+	install(FILES $<TARGET_PDB_FILE:menu> DESTINATION "${GAMEDIR}/${CLIENT_INSTALL_DIR}" OPTIONAL)
 endif()

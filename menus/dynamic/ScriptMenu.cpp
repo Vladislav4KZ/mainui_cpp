@@ -55,7 +55,7 @@ public:
 	CMenuScriptConfig();
 	~CMenuScriptConfig() override;
 
-	void SetScriptConfig( const char *path, bool earlyInit = false );
+	void SetScriptConfig( const char *path, bool bIsSettings, bool earlyInit = false );
 
 	void SaveAndPopMenu() override
 	{
@@ -85,6 +85,7 @@ private:
 	int m_iPagesIndex;
 	int m_iPagesCount;
 	int m_iCurrentPage;
+	bool m_bIsSettingsConfig;
 };
 
 CMenuScriptConfigPage::CMenuScriptConfigPage() : CMenuItemsHolder()
@@ -125,7 +126,7 @@ void CMenuScriptConfigPage::Save()
 }
 
 CMenuScriptConfig::CMenuScriptConfig() : CMenuFramework( "ScriptConfig" ),
-	m_pVars(), m_szConfig(), m_iVarsCount(), m_iPagesIndex(), m_iPagesCount(), m_iCurrentPage()
+	m_pVars(), m_szConfig(), m_iVarsCount(), m_iPagesIndex(), m_iPagesCount(), m_iCurrentPage(), m_bIsSettingsConfig()
 {
 
 }
@@ -174,7 +175,7 @@ void CMenuScriptConfig::ListItemCvarGetCb(CMenuBaseItem *pSelf, void *pExtra)
 	}
 }
 
-static void ScriptGenericCvarGetCb( CMenuBaseItem *pSelf, void *pExtra )
+static void ScriptCvarGetNoSync( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuEditable *self = (CMenuEditable*)pSelf;
 	scrvardef_t *var = (scrvardef_t*)pExtra;
@@ -184,20 +185,65 @@ static void ScriptGenericCvarGetCb( CMenuBaseItem *pSelf, void *pExtra )
 	switch( var->type )
 	{
 	case T_BOOL:
-		self->SetOriginalValue( var->value[0] == '1' ? 1.0f : 0.0f );
+	{
+		self->SetOriginalValue( ( var->value[0] == '1' ) ? 1.0f : 0.0f );
 		break;
+	}
 	case T_NUMBER:
+	{
 		self->SetOriginalValue( (float)atof( var->value ) );
 		break;
+	}
 	case T_STRING:
+	{
 		self->SetOriginalString( var->value );
 		break;
+	}
 	default:
 		break;
 	}
 }
 
-static void ScriptGenericCvarWriteCb( CMenuBaseItem *pSelf, void *pExtra )
+static void ScriptCvarGetSync( CMenuBaseItem *pSelf, void *pExtra )
+{
+	CMenuEditable *self = (CMenuEditable*)pSelf;
+	scrvardef_t *var = (scrvardef_t*)pExtra;
+
+	if( !var ) return;
+
+	switch( var->type )
+	{
+	case T_BOOL:
+	{
+		float eng = EngFuncs::GetCvarFloat( var->name );
+		float scr = ( var->value[0] == '1' ) ? 1.0f : 0.0f;
+		if( eng != scr ) self->SetOriginalValue( eng );
+		else self->SetOriginalValue( scr );
+		break;
+	}
+	case T_NUMBER:
+	{
+		float eng = EngFuncs::GetCvarFloat( var->name );
+		float scr = (float)atof( var->value );
+		if( eng != scr ) self->SetOriginalValue( eng );
+		else self->SetOriginalValue( scr );
+		break;
+	}
+	case T_STRING:
+	{
+		const char *eng = EngFuncs::GetCvarString( var->name );
+		if( eng && strcmp( eng, var->value ) )
+			self->SetOriginalString( eng );
+		else
+			self->SetOriginalString( var->value );
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+static void ScriptCvarWriteNoSync( CMenuBaseItem *pSelf, void *pExtra )
 {
 	CMenuEditable *self = (CMenuEditable*)pSelf;
 	scrvardef_t *var = (scrvardef_t*)pExtra;
@@ -224,6 +270,43 @@ static void ScriptGenericCvarWriteCb( CMenuBaseItem *pSelf, void *pExtra )
 		const char *s = self->CvarString();
 		if( s ) Q_strncpy( var->value, s, sizeof( var->value ) );
 		else var->value[0] = '\0';
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+static void ScriptCvarWriteSync( CMenuBaseItem *pSelf, void *pExtra )
+{
+	CMenuEditable *self = (CMenuEditable*)pSelf;
+	scrvardef_t *var = (scrvardef_t*)pExtra;
+
+	if( !var ) return;
+
+	switch( var->type )
+	{
+	case T_BOOL:
+	{
+		int v = (int)self->CvarValue();
+		Q_strncpy( var->value, v ? "1" : "0", sizeof( var->value ) );
+		EngFuncs::CvarSetValue( var->name, (float)v );
+		break;
+	}
+	case T_NUMBER:
+	{
+		char tmp[64];
+		snprintf( tmp, sizeof( tmp ), "%g", self->CvarValue() );
+		Q_strncpy( var->value, tmp, sizeof( var->value ) );
+		EngFuncs::CvarSetValue( var->name, self->CvarValue() );
+		break;
+	}
+	case T_STRING:
+	{
+		const char *s = self->CvarString();
+		if( s ) Q_strncpy( var->value, s, sizeof( var->value ) );
+		else var->value[0] = '\0';
+		EngFuncs::CvarSetString( var->name, var->value );
 		break;
 	}
 	default:
@@ -275,9 +358,9 @@ void CMenuScriptConfig::_Init( void )
 			editable = checkbox;
 			cvarType = CMenuEditable::CVAR_VALUE;
 
-			editable->onCvarGet = ScriptGenericCvarGetCb;
+			editable->onCvarGet = m_bIsSettingsConfig ? ScriptCvarGetNoSync : ScriptCvarGetSync;
 			editable->onCvarGet.pExtra = (void*)var;
-			editable->onCvarWrite = ScriptGenericCvarWriteCb;
+			editable->onCvarWrite = m_bIsSettingsConfig ? ScriptCvarWriteNoSync : ScriptCvarWriteSync;
 			editable->onCvarWrite.pExtra = (void*)var;
 			break;
 		}
@@ -297,9 +380,9 @@ void CMenuScriptConfig::_Init( void )
 
 			cvarType = CMenuEditable::CVAR_VALUE;
 
-			editable->onCvarGet = ScriptGenericCvarGetCb;
+			editable->onCvarGet = m_bIsSettingsConfig ? ScriptCvarGetNoSync : ScriptCvarGetSync;
 			editable->onCvarGet.pExtra = (void*)var;
-			editable->onCvarWrite = ScriptGenericCvarWriteCb;
+			editable->onCvarWrite = m_bIsSettingsConfig ? ScriptCvarWriteNoSync : ScriptCvarWriteSync;
 			editable->onCvarWrite.pExtra = (void*)var;
 			break;
 		}
@@ -310,9 +393,9 @@ void CMenuScriptConfig::_Init( void )
 			editable = field;
 			cvarType = CMenuEditable::CVAR_STRING;
 
-			editable->onCvarGet = ScriptGenericCvarGetCb;
+			editable->onCvarGet = m_bIsSettingsConfig ? ScriptCvarGetNoSync : ScriptCvarGetSync;
 			editable->onCvarGet.pExtra = (void*)var;
-			editable->onCvarWrite = ScriptGenericCvarWriteCb;
+			editable->onCvarWrite = m_bIsSettingsConfig ? ScriptCvarWriteNoSync : ScriptCvarWriteSync;
 			editable->onCvarWrite.pExtra = (void*)var;
 			break;
 		}
@@ -366,12 +449,13 @@ void CMenuScriptConfig::_Init( void )
 	pageSelector.onChanged = VoidCb( &CMenuScriptConfig::FlipMenu );
 }
 
-void CMenuScriptConfig::SetScriptConfig(const char *path, bool earlyInit)
+void CMenuScriptConfig::SetScriptConfig(const char *path, bool bIsSettings, bool earlyInit)
 {
 	if( m_szConfig && m_pVars && !stricmp( m_szConfig, path ) )
 		return; // do nothing
 
 	m_szConfig = path;
+	m_bIsSettingsConfig = bIsSettings;
 
 	if( m_pVars )
 		CSCR_FreeList( m_pVars );
@@ -412,8 +496,8 @@ void UI_AdvUserOptions_Menu()
 void UI_LoadScriptConfig()
 {
 	// yes, create cvars if needed
-	menu_serveroptions->SetScriptConfig( "settings.scr", true );
-	menu_useroptions->SetScriptConfig( "user.scr", true );
+	menu_serveroptions->SetScriptConfig( "settings.scr", true, true );
+	menu_useroptions->SetScriptConfig( "user.scr", false, true );
 }
 
 void UI_SaveScriptConfig()
