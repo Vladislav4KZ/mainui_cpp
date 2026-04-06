@@ -573,24 +573,24 @@ void CMenuPlayerSetup::_Init( void )
 	showModels.szName = L( "Show 3D preview" );
 	showModels.onCvarChange = CMenuEditable::WriteCvarCb;
 	showModels.LinkCvar( "ui_showmodels" );
-	showModels.SetCoord( 77, 230 + m_iBtnsNum * 50 + 10 );
+	showModels.SetCoord( 77, 230 + m_iBtnsNum * 50 + 5 );
 
 	hiModels.iFlags |= addFlags;
 	hiModels.szName = L( "GameUI_HighModels" );
 	hiModels.onCvarChange = CMenuEditable::WriteCvarCb;
 	hiModels.LinkCvar( "cl_himodels" );
-	hiModels.SetCoord( 77, showModels.pos.y + 50 );
+	hiModels.SetCoord( 77, showModels.pos.y + 45 );
 
 	voiceEnable.szName = L( "GameUI_EnableVoice" );
 	voiceEnable.onCvarChange = CMenuEditable::WriteCvarCb;
 	voiceEnable.LinkCvar( "voice_modenable" ); // unlike engine's voice_enable, this is synchronized with server
-	voiceEnable.SetCoord( 77, hiModels.pos.y + 50 );
+	voiceEnable.SetCoord( 77, hiModels.pos.y + 45 );
 
 	transmitVolume.szName = L( "GameUI_VoiceTransmitVolume" );
 	transmitVolume.onCvarChange = CMenuEditable::WriteCvarCb;
 	transmitVolume.Setup( 0, 1, 0.05f );
 	transmitVolume.LinkCvar( "voice_transmit_scale" );
-	transmitVolume.SetCoord( 77, voiceEnable.pos.y + 100 );
+	transmitVolume.SetCoord( 77, voiceEnable.pos.y + 75 );
 	transmitVolume.size.w = 300;
 
 	receiveVolume.szName = L( "GameUI_VoiceReceiveVolume" );
@@ -603,7 +603,7 @@ void CMenuPlayerSetup::_Init( void )
 	noProprietaryCodecNotice.szName = L( "* Uses Opus Codec.\nOpen, royalty-free, highly versatile audio codec." );
 	noProprietaryCodecNotice.colorBase = uiColorHelp;
 	noProprietaryCodecNotice.SetCharSize( QM_SMALLFONT );
-	noProprietaryCodecNotice.SetRect( 77, receiveVolume.pos.y + 30, 400, 100 );
+	noProprietaryCodecNotice.SetRect( 77, receiveVolume.pos.y + 20, 400, 100 );
 
 	if( !hideLogos )
 	{
