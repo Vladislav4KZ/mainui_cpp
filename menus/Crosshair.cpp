@@ -116,6 +116,7 @@ public:
 	CMenuCheckBox useXhair;
 	CMenuClassicCrosshair crosshair;
 	CMenuXhair xhair;
+	CMenuPicButton cancel;
 	CMenuPicButton done;
 
 private:
@@ -158,16 +159,22 @@ void CMenuCrosshair::_Init()
 	crosshair.SetRect( 72, 350, 880, 466 );
 	xhair.SetRect( 72, 350, 880, 466 );
 
+	cancel.szName = L( "GameUI_Cancel" );
+	cancel.SetCoord( 72, 280 );
+	cancel.SetPicture( PC_CANCEL );
+	cancel.onReleased = VoidCb( &CMenuCrosshair::Hide );
+
+	done.szName = L( "GameUI_OK" );
+	done.SetCoord( 222, 280 );
+	done.SetPicture( PC_DONE );
+	done.onReleased = VoidCb( &CMenuCrosshair::SaveAndPopMenu );
+
 	AddItem( banner );
 	AddItem( useXhair );
 	AddItem( crosshair );
 	AddItem( xhair );
+	AddItem( cancel );
 	AddItem( done );
-
-	done.szName = L( "GameUI_OK" );
-	done.SetCoord( 72, 280 );
-	done.SetPicture( PC_DONE );
-	done.onReleased = VoidCb( &CMenuCrosshair::SaveAndPopMenu );
 
 	ToggleMenu();
 }
