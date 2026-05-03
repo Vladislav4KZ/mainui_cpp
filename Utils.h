@@ -23,6 +23,7 @@ GNU General Public License for more details.
 #include "gameinfo.h"
 #include "FontManager.h"
 #include "BMPUtils.h"
+#include "Primitive.h"
 #include "miniutl.h"
 #if 0
 #include <tgmath.h>
@@ -133,6 +134,30 @@ inline unsigned int PackAlpha( const unsigned int ulRGB, const unsigned int ulAl
 inline unsigned int UnpackAlpha( const unsigned int ulRGBA )
 {
 	return ((ulRGBA & 0xFF000000) >> 24);
+}
+
+inline void UI_FitSizePreserveAspect( const Size &srcSize, const Size &dstSize, Point &outOffset, Size &outSize )
+{
+	outOffset = Point( 0, 0 );
+	outSize = dstSize;
+
+	if( srcSize.w > 0 && srcSize.h > 0 )
+	{
+		float scaleX = (float)dstSize.w / srcSize.w;
+		float scaleY = (float)dstSize.h / srcSize.h;
+		float scale = scaleX < scaleY ? scaleX : scaleY;
+
+		outSize.w = (int)( srcSize.w * scale + 0.5f );
+		outSize.h = (int)( srcSize.h * scale + 0.5f );
+
+		if( outSize.w < 1 )
+			outSize.w = 1;
+		if( outSize.h < 1 )
+			outSize.h = 1;
+
+		outOffset.x = ( dstSize.w - outSize.w ) / 2;
+		outOffset.y = ( dstSize.h - outSize.h ) / 2;
+	}
 }
 
 inline float InterpVal( const float from, const float to, const float frac )

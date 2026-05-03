@@ -57,6 +57,7 @@ private:
 	bool mouseYawControl;
 
 	int prevCursorX, prevCursorY;
+	bool m_bRenderingScene;
 };
 
 #endif // CMENUPLAYERMODELVIEW_H

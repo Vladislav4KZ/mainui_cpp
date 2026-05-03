@@ -57,6 +57,7 @@ GNU General Public License for more details.
 
 extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
+extern cvar_t	*ui_showclassmodels;
 extern cvar_t   *ui_show_window_stack;
 extern cvar_t	*ui_borderclip;
 extern cvar_t	*ui_prefer_won_background;
@@ -90,6 +91,8 @@ typedef struct
 
 	HFont hDefaultFont;
 	HFont hSmallFont;
+	HFont hSmallerFont;
+	HFont hTinyFont;
 	HFont hBigFont;
 	HFont hConsoleFont;
 	HFont hBoldFont;
@@ -219,6 +222,7 @@ int UI_CreditsActive( void );
 void UI_DrawFinalCredits( void );
 
 void UI_CloseMenu( void );
+void UI_CloseClientMenu( void );
 
 // SCR support
 void UI_LoadScriptConfig( void );

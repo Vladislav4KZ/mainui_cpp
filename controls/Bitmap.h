@@ -25,6 +25,7 @@ public:
 	typedef CMenuBaseItem BaseClass;
 
 	CMenuBitmap();
+	bool bKeepAspectRatio;
 
 	void VidInit( void ) override;
 	bool KeyUp( int key ) override;

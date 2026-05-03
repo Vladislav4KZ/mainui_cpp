@@ -162,6 +162,14 @@ public:
 		szTag = tag;
 	}
 
+	void SetName( const char *name )
+	{
+		if( m_bAllocName )
+			delete[] (char*)szName;
+		szName = StringCopy( name );
+		m_bAllocName = true;
+	}
+
 	CMenuItemsHolder* Parent() const			{ return m_pParent; }
 
 	#ifndef MY_COMPILER_SUCKS

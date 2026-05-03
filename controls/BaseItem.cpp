@@ -110,6 +110,12 @@ void CMenuBaseItem::SetCharSize( EFontSizes fs )
 	case QM_SMALLFONT:
 		charSize = UI_SMALL_CHAR_HEIGHT;
 		break;
+	case QM_SMALLERFONT:
+		charSize = UI_SMALLER_CHAR_HEIGHT;
+		break;
+	case QM_TINYFONT:
+		charSize = UI_TINY_CHAR_HEIGHT;
+		break;
 	case QM_BIGFONT:
 		charSize = UI_BIG_CHAR_HEIGHT;
 		break;
