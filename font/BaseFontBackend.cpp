@@ -206,9 +206,9 @@ void CBaseFont::UploadGlyphsForRanges(charRange_t *range, int rangeSize)
 		}
 	}
 
-	HIMAGE hImage = EngFuncs::PIC_Load( m_szTextureName, bmp.GetBitmap(), bmp.GetBitmapHdr()->fileSize, 0 );
-
 	SaveToCache( m_szTextureName, range, rangeSize, &bmp );
+
+	HIMAGE hImage = bmp.Upload( m_szTextureName );
 
 	delete[] temp;
 
@@ -658,7 +658,9 @@ bool CBaseFont::ReadFromCache( const char *filename, charRange_t *range, size_t 
 		return false;
 	}
 
-	HIMAGE hImage = EngFuncs::PIC_Load( filename, (const byte*)bmp, bmp->fileSize, 0 );
+	uint bmpFileSize = bmp->fileSize;
+	CBMP::SwapBmpHdrToLE( bmp );
+	HIMAGE hImage = EngFuncs::PIC_Load( filename, (const byte*)bmp, bmpFileSize, 0 );
 
 	if( !hImage )
 	{

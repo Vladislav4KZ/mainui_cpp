@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef BMPUTILS_H
 #define BMPUTILS_H
 
+#include "xash3d_types.h"
+
 #define BI_FILE_HEADER_SIZE 14
 #define BI_SIZE	40 // size of bitmap info header.
 typedef unsigned short       word;
@@ -221,6 +223,43 @@ public:
 				data[i * hdr->width + j] = Q_min( idx, max_palette_slots ); //
 			}
 		}
+	}
+
+	static inline void SwapBmpHdrToLE( bmp_t *hdr )
+	{
+		LittleLongSW( hdr->fileSize );
+		LittleLongSW( hdr->reserved0 );
+		LittleLongSW( hdr->bitmapDataOffset );
+		LittleLongSW( hdr->bitmapHeaderSize );
+		LittleLongSW( hdr->width );
+		LittleLongSW( hdr->height );
+		LittleShortSW( hdr->planes );
+		LittleShortSW( hdr->bitsPerPixel );
+		LittleLongSW( hdr->compression );
+		LittleLongSW( hdr->bitmapDataSize );
+		LittleLongSW( hdr->hRes );
+		LittleLongSW( hdr->vRes );
+		LittleLongSW( hdr->colors );
+		LittleLongSW( hdr->importantColors );
+	}
+
+	inline void SwapHdrToLE()
+	{
+		SwapBmpHdrToLE((bmp_t *)data );
+	}
+
+	inline HIMAGE Upload( const char *name, int flags = 0 )
+	{
+		uint fileSize = GetBitmapHdr()->fileSize;
+		SwapHdrToLE();
+		return EngFuncs::PIC_Load( name, GetBitmap(), fileSize, flags );
+	}
+
+	inline void Save( const char *name )
+	{
+		uint fileSize = GetBitmapHdr()->fileSize;
+		SwapHdrToLE();
+		EngFuncs::COM_SaveFile( name, GetBitmap(), fileSize );
 	}
 
 	inline byte *GetBitmap()
