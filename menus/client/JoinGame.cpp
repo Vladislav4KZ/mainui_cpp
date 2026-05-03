@@ -37,7 +37,7 @@ private:
 	void ConfirmSelection()
 	{
 		Hide();
-		EngFuncs::ClientCmd( FALSE, command );
+		EngFuncs::ClientCmd( false, command );
 	}
 
 	void teamFocusCb( void *pExtra )

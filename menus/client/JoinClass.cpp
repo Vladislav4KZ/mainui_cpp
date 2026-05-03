@@ -30,7 +30,7 @@ public:
 	void ConfirmSelection()
 	{
 		UI_CloseClientMenu();
-		EngFuncs::ClientCmd( FALSE, command );
+		EngFuncs::ClientCmd( false, command );
 	}
 
 protected:

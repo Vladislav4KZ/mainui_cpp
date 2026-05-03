@@ -28,7 +28,7 @@ public:
 	void Show() override
 	{
 		EngFuncs::KEY_SetDest( KEY_MENU );
-		EngFuncs::ClientCmd( TRUE, "touch_setclientonly 1" );
+		EngFuncs::ClientCmd( true, "touch_setclientonly 1" );
 		BaseClass::Show();
 	}
 	void Hide() override
@@ -37,7 +37,7 @@ public:
 		if ( m_pStack->Count() <= 1 )
 		{
 			EngFuncs::KEY_SetDest( KEY_GAME );
-			EngFuncs::ClientCmd( FALSE, "touch_setclientonly 0" );
+			EngFuncs::ClientCmd( false, "touch_setclientonly 0" );
 		}
 	}
 
@@ -46,7 +46,7 @@ public:
 		return CEventCallback( []( CMenuBaseItem *pSelf, void *pExtra )
 		                       {
 			UI_CloseClientMenu();
-			EngFuncs::ClientCmd( FALSE, (const char*)pExtra ); }, (void *)szCmd );
+			EngFuncs::ClientCmd( false, (const char*)pExtra ); }, (void *)szCmd );
 	}
 
 	CMenuAction *AddButton( int key, const char *name, Point pos, CEventCallback callback );

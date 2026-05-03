@@ -417,7 +417,7 @@ public:
 	void confirmCb( void *pExtra )
 	{
 		const char *command = (const char*)pExtra;
-		EngFuncs::ClientCmd( TRUE, command );
+		EngFuncs::ClientCmd( true, command );
 
 		if( EngFuncs::GetCvarFloat( "ui_cs_autofill" ))
 		{
@@ -425,8 +425,8 @@ public:
 			{
 			case BUY_NONE:
 				break;
-			case BUY_PRIMAMMO: EngFuncs::ClientCmd( FALSE, "primammo" ); break;
-			case BUY_SECAMMO:  EngFuncs::ClientCmd( FALSE, "secammo" ); break;
+			case BUY_PRIMAMMO: EngFuncs::ClientCmd( false, "primammo" ); break;
+			case BUY_SECAMMO:  EngFuncs::ClientCmd( false, "secammo" ); break;
 			case BUY_EQUIPMENT: break;
 			}
 		}
