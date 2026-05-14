@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "utflib.h"
 
 cvar_t		*ui_showmodels;
+cvar_t		*ui_showclassmodels;
 cvar_t		*ui_show_window_stack;
 cvar_t		*ui_borderclip;
 cvar_t		*ui_prefer_won_background;
@@ -597,6 +598,13 @@ void UI_CloseMenu( void )
 		EngFuncs::KEY_SetDest( KEY_GAME );
 }
 
+void UI_CloseClientMenu( void )
+{
+	uiStatic.client.Clean();
+	EngFuncs::KEY_SetDest( KEY_GAME );
+	EngFuncs::ClientCmd( false, "touch_setclientonly 0" );
+}
+
 // =====================================================================
 
 
@@ -1143,6 +1151,7 @@ void UI_Init( void )
 {
 	// register our cvars and commands
 	ui_showmodels = EngFuncs::CvarRegister( "ui_showmodels", "0", FCVAR_ARCHIVE );
+	ui_showclassmodels = EngFuncs::CvarRegister( "ui_showclassmodels", "1", FCVAR_ARCHIVE );
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", "0", FCVAR_ARCHIVE );
 	ui_borderclip = EngFuncs::CvarRegister( "ui_borderclip", "0", FCVAR_ARCHIVE );
 	ui_prefer_won_background = EngFuncs::CvarRegister( "ui_prefer_won_background", "0", FCVAR_ARCHIVE );
@@ -1150,6 +1159,9 @@ void UI_Init( void )
 
 	// show cl_predict dialog
 	EngFuncs::CvarRegister( "menu_mp_firsttime2", "1", FCVAR_ARCHIVE );
+
+	// autofill ammo after bought weapon
+	EngFuncs::CvarRegister( "ui_cs_autofill", "0", FCVAR_ARCHIVE );
 
 	for( CMenuEntry *entry = s_pEntries; entry; entry = entry->m_pNext )
 	{

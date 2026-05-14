@@ -15,6 +15,8 @@ GNU General Public License for more details.
 
 #ifndef BASEMENU_H
 #define BASEMENU_H
+#include "cl_dll/IGameClientExports.h"
+#include "cl_dll/IGameMenuExports.h"
 #include "enginecallback_menu.h"
 #include "keydefs.h"
 #include "Primitive.h"
@@ -55,8 +57,10 @@ GNU General Public License for more details.
 // =====================================================================
 // Main menu interface
 
+extern IGameClientExports *g_pClient;
 extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
+extern cvar_t	*ui_showclassmodels;
 extern cvar_t   *ui_show_window_stack;
 extern cvar_t	*ui_borderclip;
 extern cvar_t	*ui_prefer_won_background;
@@ -90,6 +94,8 @@ typedef struct
 
 	HFont hDefaultFont;
 	HFont hSmallFont;
+	HFont hSmallerFont;
+	HFont hTinyFont;
 	HFont hBigFont;
 	HFont hConsoleFont;
 	HFont hBoldFont;
@@ -219,6 +225,7 @@ int UI_CreditsActive( void );
 void UI_DrawFinalCredits( void );
 
 void UI_CloseMenu( void );
+void UI_CloseClientMenu( void );
 
 // SCR support
 void UI_LoadScriptConfig( void );

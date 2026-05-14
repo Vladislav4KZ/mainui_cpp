@@ -12,6 +12,7 @@ public:
 	void VidInit() override;
 	void Draw() override;
 	bool KeyDown( int key ) override;
+	bool KeyUp( int key ) override;
 	bool MouseMove( int x, int y ) override;
 
 	Point GetPositionOffset() const override;
@@ -22,12 +23,15 @@ private:
 	Point m_scScrollBarPos;
 	Size  m_scScrollBarSize;
 	bool  m_bScrollBarSliding;
-	bool  m_bDisableScrolling; // can't actually scroll due to item placement
+	bool  m_bDisableScrollingY; // can't actually scroll due to item placement
+	bool  m_bDisableScrollingX;
 	bool  m_bHoldingMouse1;
 	Point m_HoldingPoint;
 
-	int m_iPos;
-	int m_iMax;
+	int m_iPosY;
+	int m_iMaxY;
+	int m_iPosX;
+	int m_iMaxX;
 	// float m_flOverScrolling;
 };
 
