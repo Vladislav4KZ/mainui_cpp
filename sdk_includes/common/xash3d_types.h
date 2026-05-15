@@ -114,6 +114,7 @@ typedef int qboolean;
 	#define FORMAT_CHECK( x )  __attribute__(( format( printf, x, x + 1 )))
 	#define ALLOC_CHECK( x )   __attribute__(( alloc_size( x )))
 	#define WARN_UNUSED_RESULT __attribute__(( warn_unused_result ))
+	#define MAYBE_UNUSED       __attribute__(( unused ))
 	#define RENAME_SYMBOL( x ) asm( x )
 	#if !defined( offsetof )
 		#define offsetof( s, m )   __builtin_offsetof( s, m )
@@ -198,6 +199,10 @@ typedef int qboolean;
 	#define WARN_UNUSED_RESULT
 #endif // !defined( WARN_UNUSED_RESULT )
 
+#if !defined( MAYBE_UNUSED )
+	#define MAYBE_UNUSED
+#endif // !defined( MAYBE_UNUSED )
+
 #if !defined( RENAME_SYMBOL )
 	#define RENAME_SYMBOL( x )
 #endif // !defined( RENAME_SYMBOL )
@@ -243,7 +248,10 @@ typedef int qboolean;
 #define Swap32Store( x ) ( x = Swap32( x ))
 #define Swap16Store( x ) ( x = Swap16( x ))
 
-#ifdef XASH_BIG_ENDIAN
+#define LittleFourCC( a, b, c, d ) (((uint32_t)( d ) << 24 ) | ((uint32_t)( c ) << 16 ) | ((uint32_t)( b ) << 8 ) | (uint32_t)( a ))
+#define BigFourCC( a, b, c, d )    (((uint32_t)( a ) << 24 ) | ((uint32_t)( b ) << 16 ) | ((uint32_t)( c ) << 8 ) | (uint32_t)( d ))
+
+#if XASH_BIG_ENDIAN
 	#define LittleLong( x )    Swap32( x )
 	#define LittleShort( x )   Swap16( x )
 	#define LittleLongSW( x )  Swap32Store( x )
@@ -252,6 +260,7 @@ typedef int qboolean;
 	#define BigLong( x )  ( x )
 	#define BigShort( x ) ( x )
 	#define BigFloat( x ) ( x )
+	#define HostFourCC( a, b, c, d ) BigFourCC( a, b, c, d )
 #else
 	#define LittleLong( x )  ( x )
 	#define LittleShort( x )  ( x )
@@ -261,6 +270,7 @@ typedef int qboolean;
 	#define BigLong( x )  Swap32( x )
 	#define BigShort( x ) Swap16( x )
 	#define BigFloat( x ) SwapFloat( x )
+	#define HostFourCC( a, b, c, d ) LittleFourCC( a, b, c, d )
 #endif
 
 #endif // XASH_TYPES_H

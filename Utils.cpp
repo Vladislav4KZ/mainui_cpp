@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BaseMenu.h"
 #include "Utils.h"
 #include "keydefs.h"
-#include "BtnsBMPTable.h"
+#include "Btns.h"
 #include "utflib.h"
 
 #if defined _WIN32
@@ -338,6 +338,9 @@ CBMP* CBMP::LoadFile( const char *filename )
 	// not a BMP
 	if( bmp->id[0] != 'B' || bmp->id[1] != 'M' )
 		return NULL;
+
+	// convert on-disk little-endian header fields to host byte order
+	CBMP::SwapBmpHdrToLE( bmp );
 
 	// bogus data
 	if( !bmp->width || !bmp->height )

@@ -17,6 +17,12 @@ enum EFontFlags
 #define UI_SMALL_CHAR_WIDTH		10
 #define UI_SMALL_CHAR_HEIGHT	20
 
+#define UI_SMALLER_CHAR_WIDTH	8
+#define UI_SMALLER_CHAR_HEIGHT	16
+
+#define UI_TINY_CHAR_WIDTH		6
+#define UI_TINY_CHAR_HEIGHT		12
+
 #define UI_MED_CHAR_WIDTH		13
 #define UI_MED_CHAR_HEIGHT		26
 
@@ -31,6 +37,8 @@ enum EFontSizes
 	QM_DEFAULTFONT = 0, // medium size font
 #endif
 	QM_SMALLFONT,       // small
+	QM_SMALLERFONT,     // smaller
+	QM_TINYFONT,        // tiny
 	QM_BIGFONT,         // big
 	QM_BOLDFONT,
 };
@@ -99,6 +107,5 @@ private:
 	HFont m_hForceHandle;
 	friend class CFontManager;
 };
-
 
 #endif // FONT_RENDERER_H

@@ -15,13 +15,15 @@ GNU General Public License for more details.
 
 #ifndef BASEMENU_H
 #define BASEMENU_H
+#include "cl_dll/IGameClientExports.h"
+#include "cl_dll/IGameMenuExports.h"
 #include "enginecallback_menu.h"
 #include "keydefs.h"
 #include "Primitive.h"
 #include "EventSystem.h"
 #include "Utils.h"
 #include "FontManager.h"
-#include "BtnsBMPTable.h"
+#include "Btns.h"
 #include "WindowSystem.h"
 #include "Image.h"
 #include "utlstring.h"
@@ -55,8 +57,10 @@ GNU General Public License for more details.
 // =====================================================================
 // Main menu interface
 
+extern IGameClientExports *g_pClient;
 extern cvar_t	*ui_precache;
 extern cvar_t	*ui_showmodels;
+extern cvar_t	*ui_showclassmodels;
 extern cvar_t   *ui_show_window_stack;
 extern cvar_t	*ui_borderclip;
 extern cvar_t	*ui_prefer_won_background;
@@ -90,6 +94,8 @@ typedef struct
 
 	HFont hDefaultFont;
 	HFont hSmallFont;
+	HFont hSmallerFont;
+	HFont hTinyFont;
 	HFont hBigFont;
 	HFont hConsoleFont;
 	HFont hBoldFont;
@@ -113,12 +119,7 @@ typedef struct
 	int		initialized;
 
 	// btns_main.bmp stuff
-	HIMAGE	buttonsPics[PC_BUTTONCOUNT];
-
-	int		buttons_width; // btns_main.bmp global width
-	int		buttons_height; // one button height
-	int		buttons_points[3];
-
+	CBtnsManager btns;
 	Size		buttons_draw_size; // scaled image what we drawing
 	int		width;
 	bool	textInput;
@@ -219,12 +220,12 @@ inline void UI_DrawRectangleExt( Point pos, Size size, const unsigned int color,
 }
 
 void UI_StartSound( const char *sound );
-void UI_LoadBmpButtons();
 
 int UI_CreditsActive( void );
 void UI_DrawFinalCredits( void );
 
 void UI_CloseMenu( void );
+void UI_CloseClientMenu( void );
 
 // SCR support
 void UI_LoadScriptConfig( void );

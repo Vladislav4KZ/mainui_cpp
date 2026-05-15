@@ -81,6 +81,12 @@ void CFontManager::VidInit( void )
 		uiStatic.hSmallFont   = CFontBuilder( DEFAULT_MENUFONT, UI_SMALL_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
 			.SetHandleNum( QM_SMALLFONT )
 			.Create();
+		uiStatic.hSmallerFont = CFontBuilder( DEFAULT_MENUFONT, UI_SMALLER_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
+			.SetHandleNum( QM_SMALLERFONT )
+			.Create();
+		uiStatic.hTinyFont    = CFontBuilder( DEFAULT_MENUFONT, UI_TINY_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
+			.SetHandleNum( QM_TINYFONT )
+			.Create();
 		uiStatic.hBigFont     = CFontBuilder( DEFAULT_MENUFONT, UI_BIG_CHAR_HEIGHT * scale, DEFAULT_WEIGHT )
 			.SetHandleNum( QM_BIGFONT )
 			.Create();

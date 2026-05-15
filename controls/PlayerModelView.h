@@ -34,7 +34,10 @@ public:
 	void Draw() override;
 	bool KeyDown( int key ) override;
 	bool KeyUp( int key ) override;
+	bool MouseMove( int x, int y ) override;
 	void CalcFov();
+
+	bool m_bCanCaptureFocus;
 
 	HIMAGE hPlayerImage;
 
@@ -57,6 +60,7 @@ private:
 	bool mouseYawControl;
 
 	int prevCursorX, prevCursorY;
+	bool m_bRenderingScene;
 };
 
 #endif // CMENUPLAYERMODELVIEW_H
