@@ -53,7 +53,7 @@ protected:
 	const char *m_szDefaultClass;
 
 private:
-	const char *command;
+	CUtlString command;
 
 	void classFocusCb( void *pExtra )
 	{
@@ -61,39 +61,74 @@ private:
 		text.Show();
 		const char *sz = (const char *)pExtra;
 		const char *loctext = NULL;
-		char model[256];
-		static const char *table[5 * 6] =
-		{
-			"terror",   "urban",    "joinclass 1", "Cstrike_Terror_Label", "Cstrike_Urban_Label",
-			"leet",     "gsg9",     "joinclass 2", "Cstrike_Leet_Label", "Cstrike_GSG9_Label",
-			"arctic",   "sas",      "joinclass 3", "Cstrike_Arctic_Label", "Cstrike_SAS_Label",
-			"guerilla", "gign",     "joinclass 4", "Cstrike_Guerilla_Label", "Cstrike_GIGN_Label",
-			"militia",  "spetsnaz", "joinclass 5", "Cstrike_Militia_Label", "Cstrike_Spetsnaz_Label",
-			"ct_random", "t_random", "joinclass 6", "Cstrike_AutoSelect_Label", "Cstrike_AutoSelect_Label",
+		CUtlString model;
+		
+		struct ClassEntry {
+			const char *modelT;
+			const char *modelCT;
+			const char *labelT;
+			const char *labelCT;
+			int joinClass;
 		};
 
+		static constexpr int JOINCLASS_AUTO_CS = 5;
+		static constexpr int JOINCLASS_AUTO_CZ = 6;
+
+		static const ClassEntry classTable[] =
+		{
+			{ "terror",   "urban",    "Cstrike_Terror_Label", "Cstrike_Urban_Label", 1 },
+			{ "leet",     "gsg9",     "Cstrike_Leet_Label", "Cstrike_GSG9_Label", 2 },
+			{ "arctic",   "sas",      "Cstrike_Arctic_Label", "Cstrike_SAS_Label", 3 },
+			{ "guerilla", "gign",     "Cstrike_Guerilla_Label", "Cstrike_GIGN_Label", 4 },
+		};
+
+		static const ClassEntry czeroClass = { "militia",  "spetsnaz", "Cstrike_Militia_Label", "Cstrike_Spetsnaz_Label", 5 };
+
+		static constexpr int TOTAL_CLASSES = (int)(sizeof(classTable) / sizeof(classTable[0]));
 
 		bool showModel = true;
-		int idx;
-		for( idx = 0; idx < 5 * 6; idx += 5 )
+
+		if( !strcmp( sz, "t_random" ) || !strcmp( sz, "ct_random" ) )
 		{
-			if( !strcmp( sz, table[idx] ) )
-			{
-				command = table[idx + 2];
-				loctext = L( table[idx + 3] );
-				break;
-			}
-
-			if( !strcmp( sz, table[idx + 1] ) )
-			{
-				command = table[idx + 2];
-				loctext = L( table[idx + 4] );
-				break;
-			}
-		}
-
-		if( idx >= 5 * 5 )
+			int joinClass = hasCzero ? JOINCLASS_AUTO_CZ : JOINCLASS_AUTO_CS;
+			command.Format( "joinclass %d", joinClass );
+			loctext = L( "Cstrike_AutoSelect_Label" );
 			showModel = false;
+		}
+		else if( hasCzero && !strcmp( sz, czeroClass.modelT ) )
+		{
+			command.Format( "joinclass %d", czeroClass.joinClass );
+			loctext = L( czeroClass.labelT );
+		}
+		else if( hasCzero && !strcmp( sz, czeroClass.modelCT ) )
+		{
+			command.Format( "joinclass %d", czeroClass.joinClass );
+			loctext = L( czeroClass.labelCT );
+		}
+		else
+		{
+			int idx;
+			for( idx = 0; idx < TOTAL_CLASSES; idx++ )
+			{
+				const ClassEntry &entry = classTable[idx];
+				if( !strcmp( sz, entry.modelT ) )
+				{
+					command.Format( "joinclass %d", entry.joinClass );
+					loctext = L( entry.labelT );
+					break;
+				}
+
+				if( !strcmp( sz, entry.modelCT ) )
+				{
+					command.Format( "joinclass %d", entry.joinClass );
+					loctext = L( entry.labelCT );
+					break;
+				}
+			}
+
+			if( idx >= TOTAL_CLASSES )
+				showModel = false;
+		}
 
 		if( !loctext )
 			loctext = "";
@@ -104,7 +139,7 @@ private:
 			player.ent = EngFuncs::GetPlayerModel();
 			if( player.ent )
 			{
-				snprintf( model, sizeof( model ), "models/player/%s/%s.mdl", sz, sz );
+				model.Format( "models/player/%s/%s.mdl", sz, sz );
 				player.hPlayerImage = 0;
 				player.eOverrideMode = CMenuPlayerModelView::PMV_SHOWMODEL;
 				EngFuncs::SetModel( player.ent, model );
@@ -125,7 +160,7 @@ private:
 
 		if( !showModel )
 		{
-			snprintf( model, sizeof( model ), "gfx/vgui/%s.tga", sz );
+			model.Format( "gfx/vgui/%s.tga", sz );
 
 			player.hPlayerImage = EngFuncs::PIC_Load( model );
 			player.eOverrideMode = CMenuPlayerModelView::PMV_SHOWIMAGE;
@@ -212,10 +247,17 @@ void CClientJoinClassT::_Init()
 	AddButton( '4', L( "Cstrike_Guerilla" ), "guerilla",
 		Point( 100, 330 ));
 	if( hasCzero )
+	{
 		AddButton( '5', L( "Cstrike_Militia" ), "militia",
 			Point( 100, 380 ));
-	AddButton( '6', L( "Cstrike_Auto_Select" ), "t_random",
-		Point( 100, 430 ));
+		AddButton( '6', L( "Cstrike_Auto_Select" ), "t_random",
+			Point( 100, 430 ));
+	}
+	else
+	{
+		AddButton( '5', L( "Cstrike_Auto_Select" ), "t_random",
+			Point( 100, 430 ));
+	}
 
 	BaseClass::_Init();
 }
@@ -232,10 +274,17 @@ void CClientJoinClassCT::_Init()
 	AddButton( '4', L( "Cstrike_GIGN" ), "gign",
 		Point( 100, 330 ));
 	if( hasCzero )
+	{
 		AddButton( '5', L( "Cstrike_Spetsnaz" ), "spetsnaz",
 			Point( 100, 380 ));
-	AddButton( '6', L( "Cstrike_Auto_Select" ), "ct_random",
-		Point( 100, 430 ));
+		AddButton( '6', L( "Cstrike_Auto_Select" ), "ct_random",
+			Point( 100, 430 ));
+	}
+	else
+	{
+		AddButton( '5', L( "Cstrike_Auto_Select" ), "ct_random",
+			Point( 100, 430 ));
+	}
 
 	BaseClass::_Init();
 }
