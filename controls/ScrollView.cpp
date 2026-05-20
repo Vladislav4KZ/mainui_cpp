@@ -104,6 +104,47 @@ Point CMenuScrollView::GetPositionOffset() const
 
 bool CMenuScrollView::MouseMove( int x, int y )
 {
+	// support touch scrolling via global cursorDY (accumulated in UI_MouseMove)
+	if( !m_bScrollBarSliding && FBitSet( iFlags, QMF_HASMOUSEFOCUS ))
+	{
+		static float ac_y = 0;
+
+		ac_y += cursorDY;
+		cursorDY = 0;
+
+		if( !m_bDisableScrollingY )
+		{
+			// accumulate and apply vertical scroll; divide by 2 to match drag-sensitivity in Draw()
+			int move = (int)(ac_y / 2.0f);
+			if( move != 0 )
+			{
+				int newPosY = m_iPosY - move;
+				newPosY = bound( 0, newPosY, Q_max(0, m_iMaxY - m_scSize.h) );
+				if( newPosY != m_iPosY )
+				{
+					m_iPosY = newPosY;
+					FOR_EACH_VEC( m_pItems, i )
+					{
+						CMenuBaseItem *pItem = m_pItems[i];
+
+						pItem->VidInit();
+					}
+				}
+
+				// subtract applied portion
+				ac_y -= move * 2.0f;
+			}
+		}
+
+		if( !m_bDisableScrollingX )
+		{
+			// horizontal touch scroll rarely used for map descriptions, but handle similarly
+			static float ac_x = 0;
+			ac_x += 0; // placeholder for future horizontal cursor accumulation
+			(void)ac_x;
+		}
+	}
+
 	return CMenuItemsHolder::MouseMove( x, y );
 }
 
