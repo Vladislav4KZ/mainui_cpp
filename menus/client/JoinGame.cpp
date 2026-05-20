@@ -84,7 +84,7 @@ void CClientJoinGame::_Init()
 	scroll.colorStroke = uiInputTextColor;
 	scroll.iStrokeWidth = 1;
 
-	text.SetRect( 0, 0, 0, 0 );
+	text.SetRect( 0, 0, 400, 0 );
 	text.SetBackground( 0U );
 	text.SetInactive( true );
 	text.SetCharSize( QM_SMALLERFONT );
@@ -157,7 +157,6 @@ void CClientJoinGame::Reload()
 	}
 
 	text.size.h = 0; // recalc
-	text.size.w = 0; // recalc
 	scroll.VidInit();
 }
 void UI_JoinGame_Show( int param1, int param2 )

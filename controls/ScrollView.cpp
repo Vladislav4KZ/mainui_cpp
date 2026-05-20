@@ -31,11 +31,11 @@ void CMenuScrollView::VidInit()
 		if( pt.x + sz.w > m_iMaxX )
 			m_iMaxX = pt.x + sz.w;
 	}
-	m_bDisableScrollingY = (m_iMaxY <= size.h);
-	m_bDisableScrollingX = (m_iMaxX <= size.w);
-
 	m_iMaxY *= uiStatic.scaleY;
 	m_iMaxX *= uiStatic.scaleX;
+
+	m_bDisableScrollingY = (m_iMaxY <= m_scSize.h);
+	m_bDisableScrollingX = (m_iMaxX <= m_scSize.w);
 }
 
 bool CMenuScrollView::KeyDown( int key )
