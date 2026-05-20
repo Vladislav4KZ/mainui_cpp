@@ -2,7 +2,9 @@
 #include "Scissor.h"
 
 CMenuScrollView::CMenuScrollView() : CMenuItemsHolder (),
-	m_bHoldingMouse1( false )
+	m_bHoldingMouse1( false ),
+	m_bDragScrolled( false ),
+	m_StartHoldingPoint()
 {
 }
 
@@ -13,6 +15,7 @@ void CMenuScrollView::VidInit()
 	BaseClass::VidInit();
 
 	m_bHoldingMouse1 = false;
+	m_bDragScrolled = false;
 	m_iMaxY = 0;
 	m_iPosY = 0;
 	m_iMaxX = 0;
@@ -42,7 +45,9 @@ bool CMenuScrollView::KeyDown( int key )
 		if( UI_CursorInRect( m_scPos, m_scSize ))
 		{
 			m_bHoldingMouse1 = true;
+			m_bDragScrolled = false;
 			m_HoldingPoint = Point( uiStatic.cursorX, uiStatic.cursorY );
+			m_StartHoldingPoint = m_HoldingPoint;
 			return true;
 		}
 	}
@@ -92,6 +97,11 @@ bool CMenuScrollView::KeyUp( int key )
 	if( UI::Key::IsLeftMouse( key ))
 	{
 		m_bHoldingMouse1 = false;
+		if( m_bDragScrolled )
+		{
+			m_bDragScrolled = false;
+			return true;
+		}
 	}
 
 	return CMenuItemsHolder::KeyUp( key );
@@ -104,45 +114,26 @@ Point CMenuScrollView::GetPositionOffset() const
 
 bool CMenuScrollView::MouseMove( int x, int y )
 {
-	// support touch scrolling via global cursorDY (accumulated in UI_MouseMove)
-	if( !m_bScrollBarSliding && FBitSet( iFlags, QMF_HASMOUSEFOCUS ))
+	// Consume accumulated cursor deltas if we have focus or are holding
+	if( FBitSet( iFlags, QMF_HASMOUSEFOCUS ) || m_bHoldingMouse1 )
 	{
-		static float ac_y = 0;
-
-		ac_y += cursorDY;
 		cursorDY = 0;
+		cursorDX = 0;
+	}
 
-		if( !m_bDisableScrollingY )
+	if( m_bHoldingMouse1 )
+	{
+		int dx = uiStatic.cursorX - m_StartHoldingPoint.x;
+		int dy = uiStatic.cursorY - m_StartHoldingPoint.y;
+		if( !m_bDragScrolled && (dx * dx + dy * dy > 100) ) // 10px threshold
 		{
-			// accumulate and apply vertical scroll; divide by 2 to match drag-sensitivity in Draw()
-			int move = (int)(ac_y / 2.0f);
-			if( move != 0 )
-			{
-				int newPosY = m_iPosY - move;
-				newPosY = bound( 0, newPosY, Q_max(0, m_iMaxY - m_scSize.h) );
-				if( newPosY != m_iPosY )
-				{
-					m_iPosY = newPosY;
-					FOR_EACH_VEC( m_pItems, i )
-					{
-						CMenuBaseItem *pItem = m_pItems[i];
-
-						pItem->VidInit();
-					}
-				}
-
-				// subtract applied portion
-				ac_y -= move * 2.0f;
-			}
+			m_bDragScrolled = true;
 		}
+	}
 
-		if( !m_bDisableScrollingX )
-		{
-			// horizontal touch scroll rarely used for map descriptions, but handle similarly
-			static float ac_x = 0;
-			ac_x += 0; // placeholder for future horizontal cursor accumulation
-			(void)ac_x;
-		}
+	if( m_bDragScrolled )
+	{
+		return true;
 	}
 
 	return CMenuItemsHolder::MouseMove( x, y );

@@ -26,7 +26,9 @@ private:
 	bool  m_bDisableScrollingY; // can't actually scroll due to item placement
 	bool  m_bDisableScrollingX;
 	bool  m_bHoldingMouse1;
+	bool  m_bDragScrolled;
 	Point m_HoldingPoint;
+	Point m_StartHoldingPoint;
 
 	int m_iPosY;
 	int m_iMaxY;

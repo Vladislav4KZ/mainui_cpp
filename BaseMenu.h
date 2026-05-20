@@ -137,6 +137,7 @@ typedef struct
 } uiStatic_t;
 
 extern float	cursorDY;			// use for touch scroll
+extern float	cursorDX;
 extern bool g_bCursorDown;
 extern uiStatic_t		uiStatic;
 

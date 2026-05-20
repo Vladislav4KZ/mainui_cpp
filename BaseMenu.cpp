@@ -744,6 +744,7 @@ void UI_CharEvent( int key )
 
 bool g_bCursorDown;
 float cursorDY;
+float cursorDX;
 
 /*
 =================
@@ -753,6 +754,7 @@ UI_MouseMove
 void UI_MouseMove( int x, int y )
 {
 	bool clientActive, menuActive;
+	static bool prevDown = false;
 
 	if( !uiStatic.initialized )
 		return;
@@ -768,20 +770,30 @@ void UI_MouseMove( int x, int y )
 
 	if( g_bCursorDown )
 	{
-		static bool prevDown = false;
-
 		if( !prevDown )
 		{
 			prevDown = true;
 			cursorDY = 0;
+			cursorDX = 0;
 		}
-		else if( y - uiStatic.cursorY )
+		else
 		{
-			cursorDY += y - uiStatic.cursorY;
+			if( y - uiStatic.cursorY )
+			{
+				cursorDY += y - uiStatic.cursorY;
+			}
+			if( x - uiStatic.cursorX )
+			{
+				cursorDX += x - uiStatic.cursorX;
+			}
 		}
 	}
 	else
+	{
 		cursorDY = 0;
+		cursorDX = 0;
+		prevDown = false;
+	}
 	//Con_Printf("%d %d %f\n",x, y, cursorDY);
 
 	// now menu uses absolute coordinates
