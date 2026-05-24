@@ -601,6 +601,7 @@ void UI_CloseMenu( void )
 void UI_CloseClientMenu( void )
 {
 	uiStatic.client.Clean();
+	EngFuncs::KEY_ClearStates();
 	EngFuncs::KEY_SetDest( KEY_GAME );
 	EngFuncs::ClientCmd( false, "touch_setclientonly 0" );
 }
