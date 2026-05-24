@@ -52,6 +52,7 @@ public:
 		BaseClass::Hide();
 		if ( m_pStack->Count() <= 1 )
 		{
+			EngFuncs::KEY_ClearStates();
 			EngFuncs::KEY_SetDest( KEY_GAME );
 			EngFuncs::ClientCmd( false, "touch_setclientonly 0" );
 		}
