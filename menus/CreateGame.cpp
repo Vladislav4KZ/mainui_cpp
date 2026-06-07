@@ -31,6 +31,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ART_BANNER		"gfx/shell/head_creategame"
 
+static const char *MAX_CLIENTS_STRING()
+{
+	static CUtlString maxClientsStr;
+	maxClientsStr.Format( "%d", MAX_CLIENTS );
+	return maxClientsStr.String();
+}
+
 struct map_t
 {
 	char name[CS_SIZE];
@@ -107,6 +114,15 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 	if( !EngFuncs::IsMapValid( mapName ))
 		return;	// bad map
 
+	const char *maxPlayersBuf = menu->maxClients.GetBuffer();
+	int players = atoi( maxPlayersBuf );
+	if( players < 2 || players > MAX_CLIENTS )
+	{
+		CUtlString msg;
+		msg.Format( L( "Invalid maxplayers value entered.\nPlease enter a value from 2 to %d." ), MAX_CLIENTS );
+		UI_ShowMessageBox( msg.String() );
+		return;
+	}
 	if( EngFuncs::GetCvarFloat( "host_serverstate" ))
 	{
 		if( EngFuncs::GetCvarFloat( "maxplayers" ) == 1.0f )
@@ -207,7 +223,7 @@ void CMenuCreateGame::_Init( void )
 	banner.SetPicture( ART_BANNER );
 
 	nat.szName = L( "Use NAT Bypass instead of direct mode" );
-	nat.bChecked = true;
+	nat.bChecked = false;
 	nat.LinkCvar( "sv_nat" );
 
 	// add them here, so "done" button can be used by mapsListModel::Update
@@ -242,10 +258,8 @@ void CMenuCreateGame::_Init( void )
 		if( buf[0] == 0 ) return;
 
 		int players = atoi( buf );
-		if( players <= 1 )
-			self->SetBuffer( "2" );
-		else if( players > 32 )
-			self->SetBuffer( "32" );
+		if( players > MAX_CLIENTS )
+			self->SetBuffer( MAX_CLIENTS_STRING() );
 	});
 	SET_EVENT_MULTI( maxClients.onCvarGet,
 	{
@@ -258,8 +272,8 @@ void CMenuCreateGame::_Init( void )
 		int players = atoi( buf );
 		if( players <= 1 )
 			self->SetBuffer( "16" );
-		else if( players > 32 )
-			self->SetBuffer( "32" );
+		else if( players > MAX_CLIENTS )
+			self->SetBuffer( MAX_CLIENTS_STRING() );
 	});
 	maxClients.LinkCvar( "maxplayers" );
 
@@ -289,9 +303,10 @@ void CMenuCreateGame::_Init( void )
 void CMenuCreateGame::_VidInit()
 {
 	nat.SetCoord( 72, 685 );
-	if( !EngFuncs::GetCvarFloat("public") )
-		nat.Hide();
-	else nat.Show();
+	nat.Hide();
+	// if( !EngFuncs::GetCvarFloat("public") )
+	// 	nat.Hide();
+	// else nat.Show();
 
 	mapsList.SetRect( 590, 230, -20, 465 );
 
@@ -323,7 +338,8 @@ void CMenuCreateGame::SaveCvars()
 	UI_SetScriptCvar( "maxplayers", maxClients.GetBuffer() );
 	UI_SetScriptCvar( "sv_password", password.GetBuffer() );
 
-	EngFuncs::CvarSetValue( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? nat.bChecked : 0 );
+	EngFuncs::CvarSetValue( "sv_nat", 0 );
+	// EngFuncs::CvarSetValue( "sv_nat", EngFuncs::GetCvarFloat( "public" ) ? nat.bChecked : 0 );
 }
 
 void CMenuCreateGame::Reload( void )
