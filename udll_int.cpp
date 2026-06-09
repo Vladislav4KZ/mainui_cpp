@@ -159,6 +159,10 @@ public:
 
 	void ShowVGUIMenu( int menuType, int param1, int param2 ) override
 	{
+		// Clear button states to prevent stuck input
+		// when opening the menu while a key is held down
+		EngFuncs::KEY_ClearStates();
+
 		switch( menuType )
 		{
 		case MENU_TEAM: UI_JoinGame_Show( param1, param2 ); break;

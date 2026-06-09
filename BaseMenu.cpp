@@ -601,6 +601,9 @@ void UI_CloseMenu( void )
 
 void UI_CloseClientMenu( void )
 {
+	if( !uiStatic.client.IsActive() )
+		return;
+
 	uiStatic.client.Clean();
 	EngFuncs::KEY_ClearStates();
 	EngFuncs::KEY_SetDest( KEY_GAME );
